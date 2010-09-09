@@ -1,0 +1,10 @@
+.DS_Store
+.classpath
+.project
+.settings/
+.local.*
+build
+target
+build-eclipse
+junit*.properties
+*.hprof
