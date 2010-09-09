@@ -6,3 +6,4 @@ target
 build-eclipse
 junit*.properties
 *.hprof
+.gradle
