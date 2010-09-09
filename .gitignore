@@ -1,6 +1,4 @@
 .DS_Store
-.classpath
-.project
 .settings/
 .local.*
 build

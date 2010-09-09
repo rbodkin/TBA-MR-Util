@@ -39,7 +39,7 @@ public class Text2Seq extends Configured implements Tool {
             return reducers;
         }
 
-        public void setReducers(Integer mappers) {
+        public void setReducers(Integer reducers) {
             this.reducers = reducers;
         }
 
@@ -112,8 +112,10 @@ public class Text2Seq extends Configured implements Tool {
         conf.setCompressMapOutput(true);
         if (o.mappers != null)
             conf.setNumMapTasks(o.mappers);
-        if (o.reducers != null)
+        if (o.reducers != null) {
+            System.out.println("# reducers: "+o.reducers);
             conf.setNumReduceTasks(o.reducers);
+        }
         conf.setNumTasksToExecutePerJvm(-1);
 
 
