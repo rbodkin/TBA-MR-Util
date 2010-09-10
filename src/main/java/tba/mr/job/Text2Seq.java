@@ -5,8 +5,8 @@ import java.io.*;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.LongWritable;
-import org.apache.hadoop.io.Text;
+import org.apache.hadoop.io.*;
+import org.apache.hadoop.io.SequenceFile.CompressionType;
 import org.apache.hadoop.mapred.*;
 import org.apache.hadoop.mapred.lib.IdentityMapper;
 import org.apache.hadoop.mapred.lib.IdentityReducer;
@@ -110,10 +110,11 @@ public class Text2Seq extends Configured implements Tool {
         conf.setOutputKeyClass(LongWritable.class);
         conf.setOutputValueClass(Text.class);
         conf.setCompressMapOutput(true);
+        SequenceFileOutputFormat.setCompressOutput(conf, true);
+        SequenceFileOutputFormat.setOutputCompressionType(conf, CompressionType.BLOCK);
         if (o.mappers != null)
             conf.setNumMapTasks(o.mappers);
         if (o.reducers != null) {
-            System.out.println("# reducers: "+o.reducers);
             conf.setNumReduceTasks(o.reducers);
         }
         conf.setNumTasksToExecutePerJvm(-1);
