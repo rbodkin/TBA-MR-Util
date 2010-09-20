@@ -12,9 +12,8 @@ import org.apache.hadoop.mapred.lib.IdentityMapper;
 import org.apache.hadoop.mapred.lib.IdentityReducer;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
-import org.cyclopsgroup.jcli.ArgumentProcessor;
-import org.cyclopsgroup.jcli.annotation.Cli;
-import org.cyclopsgroup.jcli.annotation.Option;
+import org.kohsuke.args4j.*;
+import static org.kohsuke.args4j.ExampleMode.ALL;
 
 /**
  * Job that converts from text inputs to a sequence file of text. Useful for preprocessing small files before running through pig, etc.
@@ -23,47 +22,17 @@ import org.cyclopsgroup.jcli.annotation.Option;
  *
  */
 public class Text2Seq extends Configured implements Tool {
-    @Cli(name = "text2seq")
     public static class Options {
-        @Option(name = "m", longName = "num-mappers", description = "Number of mappers")
-        public Integer getMappers() {
-            return mappers;
-        }
-
-        public void setMappers(Integer mappers) {
-            this.mappers = mappers;
-        }
-
-        @Option(name = "r", longName = "num-reducers", description = "Number of reducers")
-        public Integer getReducers() {
-            return reducers;
-        }
-
-        public void setReducers(Integer reducers) {
-            this.reducers = reducers;
-        }
-
-        @Option(name = "i", longName = "input", description = "Input file", required = true)
-        public String getInput() {
-            return input;
-        }
-
-        public void setInput(String input) {
-            this.input = input;
-        }
-
-        @Option(name = "o", longName = "output", description = "Output file", required = true)
-        public String getOutput() {
-            return output;
-        }
-
-        public void setOutput(String output) {
-            this.output = output;
-        }
-
+        @Option(name = "-m", aliases = { "--num-mappers" }, usage = "Number of mappers")
         public Integer mappers;
+
+        @Option(name = "-r", aliases = { "--num-reducers" }, usage = "Number of reducers")
         public Integer reducers;
+
+        @Option(name = "-i", aliases = { "--input" }, usage = "Input file", required = true)
         public String input;
+
+        @Option(name = "-o", aliases = { "--output" }, usage = "Output file", required = true)
         public String output;
     }
 
@@ -90,17 +59,27 @@ public class Text2Seq extends Configured implements Tool {
 
     public int run(String[] args) {
         Options o = new Options();
-        ArgumentProcessor<Options> ap = ArgumentProcessor.newInstance(Options.class);
-        ap.process(args, o);
+        CmdLineParser parser = new CmdLineParser(o);
+
+        try {
+            parser.parseArgument(args);
+        } catch( CmdLineException e ) {
+            System.err.println(e.getMessage());
+            System.err.println("Usage: java text2seq [options...] arguments...");
+            // print the list of available options
+            parser.printUsage(System.err);
+            System.err.println();
+
+            // print option sample. This is useful some time
+            System.err.println("  Example: java SampleMain"+parser.printExample(ALL));
+
+            return 1;
+        }
         if (o.input == null || o.output == null) {
-            System.err.print("Usage: text2seq ");
-            try {
-                ap.printHelp(new PrintWriter(System.err));
-            }
-            catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            System.exit(2);
+            for (String arg : args) System.err.println(arg);
+            System.err.println("Usage: java text2seq [options...] arguments...");
+            parser.printUsage(System.err);
+            return 1;
         }
         JobConf conf = new JobConf(getConf(), Text2Seq.class);
         conf.setMapperClass(DebugIdMapper.class);
