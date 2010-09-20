@@ -75,12 +75,6 @@ public class Text2Seq extends Configured implements Tool {
 
             return 1;
         }
-        if (o.input == null || o.output == null) {
-            for (String arg : args) System.err.println(arg);
-            System.err.println("Usage: java text2seq [options...] arguments...");
-            parser.printUsage(System.err);
-            return 1;
-        }
         JobConf conf = new JobConf(getConf(), Text2Seq.class);
         conf.setMapperClass(DebugIdMapper.class);
         conf.setReducerClass(IdentityReducer.class);
